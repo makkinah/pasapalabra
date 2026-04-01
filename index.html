@@ -7,56 +7,57 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- PANTALLA CONFIGURACIÓN -->
-    <div class="container config-screen" id="configScreen">
-        <h1>🎮 PASAPALABRA</h1>
-        
-        <div class="input-group">
-            <label>🔢 Cantidad de Jugadores:</label>
-            <input type="number" id="playersCount" min="1" max="8" value="2">
+
+<div class="container config-screen" id="configScreen">
+    <h1>🎮 PASAPALABRA</h1>
+    
+    <div class="input-group">
+        <label>🔢 Cantidad de Jugadores:</label>
+        <input type="number" id="playersCount" min="1" max="8" value="2">
+    </div>
+    
+    <div id="playersNames"></div>
+    
+    <div class="input-group">
+        <label>⏱️ Tiempo TOTAL (min:seg):</label>
+        <input type="text" id="totalTimeInput" placeholder="05:00" maxlength="5">
+        <small>Ejemplo: 05:00 = 5 minutos</small>
+    </div>
+    
+    <button class="btn-start" onclick="generatePlayerInputs()">➕ Generar Nombres</button>
+    <button class="btn-start" onclick="startGame()" id="startBtn" style="display:none;">🚀 ¡INICIAR JUEGO!</button>
+</div>
+
+<div class="game-screen" id="gameScreen">
+    <div class="header">
+        <div class="player-info">
+            <div><strong>Jugador:</strong> <span id="currentPlayer">1</span></div>
+            <div><strong>Puntos:</strong> <span id="currentScore">0</span></div>
+            <div id="turnInfo">Turno activo</div>
         </div>
-        
-        <div id="playersNames"></div>
-        
-        <div class="input-group">
-            <label>⏱️ Tiempo TOTAL (min:seg):</label>
-            <input type="text" id="totalTimeInput" placeholder="05:00" maxlength="5">
-            <small>Ejemplo: 05:00 = 5 minutos</small>
-        </div>
-        
-        <button class="btn-start" onclick="generatePlayerInputs()">➕ Generar Nombres</button>
-        <button class="btn-start" onclick="startGame()" id="startBtn" style="display:none;">🚀 ¡INICIAR JUEGO!</button>
+        <div class="timer" id="timer">05:00</div>
+    </div>
+    
+    <div class="rosco-container">
+        <div class="rosco" id="rosco"></div>
     </div>
 
-    <!-- PANTALLA JUEGO -->
-    <div class="game-screen" id="gameScreen">
-        <div class="header">
-            <div class="player-info">
-                <div><strong>Jugador:</strong> <span id="currentPlayer">1</span></div>
-                <div><strong>Puntos:</strong> <span id="currentScore">0</span></div>
-                <div id="turnInfo">Turno activo</div>
-            </div>
-            <div class="timer" id="timer">05:00</div>
-        </div>
-        
-        <div class="rosco-container">
-            <div class="rosco" id="rosco"></div>
-        </div>
-        
-        <div class="controls">
-            <button class="btn-game btn-correct" onclick="answer('correct')">✅ CORRECTA</button>
-            <button class="btn-game btn-incorrect" onclick="answer('incorrect')">❌ INCORRECTA</button>
-            <button class="btn-game btn-pass" onclick="answer('pass')">⏭️ PASAPALABRA</button>
-        </div>
+    <!-- MINI ROSCOS -->
+    <div class="mini-roscos" id="miniRoscos"></div>
+    
+    <div class="controls">
+        <button class="btn-game btn-correct" onclick="answer('correct')">✅ CORRECTA</button>
+        <button class="btn-game btn-incorrect" onclick="answer('incorrect')">❌ INCORRECTA</button>
+        <button class="btn-game btn-pass" onclick="answer('pass')">⏭️ PASAPALABRA</button>
     </div>
+</div>
 
-    <!-- PANTALLA RESULTADOS -->
-    <div class="container results-screen" id="resultsScreen">
-        <h1>🏆 ¡JUEGO TERMINADO!</h1>
-        <div id="finalScores"></div>
-        <button class="btn-start" onclick="restartGame()">🔄 Nuevo Juego</button>
-    </div>
+<div class="container results-screen" id="resultsScreen">
+    <h1>🏆 ¡JUEGO TERMINADO!</h1>
+    <div id="finalScores"></div>
+    <button class="btn-start" onclick="restartGame()">🔄 Nuevo Juego</button>
+</div>
 
-    <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>

@@ -365,3 +365,108 @@ small {
         min-width: 250px;
     }
 }
+
+/* MINI ROSCOS */
+.mini-roscos {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 10px 20px 20px;
+}
+
+.mini-rosco {
+    width: 140px;
+    height: 140px;
+    position: relative;
+    opacity: 0.5;
+    transition: all 0.3s;
+}
+
+.mini-rosco.active {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.mini-letter {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    font-size: 0.8em;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    background: #222;
+    color: white;
+    border: 1px solid #555;
+}
+    
+/* LAYOUT PRINCIPAL */
+.game-main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+/* TITULO JUGADOR */
+.player-title {
+    text-align: center;
+    font-size: 2em;
+    margin-bottom: 10px;
+    text-shadow: 0 0 15px #00ffff;
+}
+
+/* MÁS ESPACIO ROSCO */
+.rosco {
+    width: 700px;
+    height: 700px;
+}
+
+/* MINI ROSCOS AL LADO */
+.mini-roscos {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* MINI ROSCO */
+.mini-rosco {
+    width: 160px;
+    height: 160px;
+    position: relative;
+    opacity: 0.5;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.mini-rosco.active {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* NOMBRE MINI */
+.mini-name {
+    margin-bottom: 5px;
+    font-size: 0.9em;
+    color: #00ffff;
+}
+
+/* LETRAS MINI */
+.mini-letter {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    font-size: 0.7em;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    background: #222;
+    color: white;
+    border: 1px solid #555;
+}

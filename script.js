@@ -1,10 +1,12 @@
+// ================== VARIABLES ==================
 let players = [];
 let currentPlayer = 0;
-let totalTimeLeft = 300;
 let timerInterval;
 let gameActive = false;
 let letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+let initialTime = 300;
 
+// ================== TIEMPO ==================
 function parseTimeInput(timeStr) {
     const parts = timeStr.split(':');
     const minutes = parseInt(parts[0]) || 0;
@@ -18,22 +20,18 @@ function formatTime(seconds) {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
+// ================== CONFIG ==================
 function generatePlayerInputs() {
     const numPlayers = parseInt(document.getElementById('playersCount').value);
     const container = document.getElementById('playersNames');
     const timeInput = document.getElementById('totalTimeInput');
     
     if (!timeInput.value) {
-        alert('⚠️ Ingresa el tiempo total primero');
+        alert('⚠️ Ingresa el tiempo primero');
         return;
     }
     
-    totalTimeLeft = parseTimeInput(timeInput.value);
-    if (totalTimeLeft < 60) {
-        alert('⚠️ El tiempo mínimo es 1 minuto');
-        return;
-    }
-    
+    initialTime = parseTimeInput(timeInput.value);
     container.innerHTML = '';
     
     for (let i = 0; i < numPlayers; i++) {
@@ -41,7 +39,7 @@ function generatePlayerInputs() {
         playerDiv.className = 'input-group player-input';
         playerDiv.innerHTML = `
             <label>Jugador ${i + 1}:</label>
-            <input type="text" id="player${i}" placeholder="Nombre del Jugador ${i + 1}" maxlength="20">
+            <input type="text" id="player${i}" placeholder="Nombre del Jugador ${i + 1}">
         `;
         container.appendChild(playerDiv);
     }
@@ -49,6 +47,7 @@ function generatePlayerInputs() {
     document.getElementById('startBtn').style.display = 'inline-block';
 }
 
+// ================== START ==================
 function startGame() {
     const numPlayers = parseInt(document.getElementById('playersCount').value);
     
@@ -65,7 +64,8 @@ function startGame() {
             name, 
             score: 0,
             letters: playerLetters,
-            currentIndex: 0
+            currentIndex: 0,
+            timeLeft: initialTime
         });
     }
     
@@ -76,10 +76,12 @@ function startGame() {
     document.getElementById('gameScreen').style.display = 'flex';
     
     createRosco();
+    createMiniRoscos();
     startTimer();
     updateDisplay();
 }
 
+// ================== ROSCO GRANDE ==================
 function createRosco() {
     const rosco = document.getElementById('rosco');
     rosco.innerHTML = '';
@@ -91,15 +93,48 @@ function createRosco() {
         letterEl.textContent = letter;
         letterEl.dataset.letter = letter;
         letterEl.dataset.index = index;
-        letterEl.style.transform = `rotate(${angle}deg) translateX(280px) rotate(-${angle}deg)`;
+
+        // 🔥 MÁS ESPACIO ENTRE LETRAS
+        letterEl.style.transform = `rotate(${angle}deg) translateX(320px) rotate(-${angle}deg)`;
         
         letterEl.addEventListener('click', () => goToLetter(index));
         rosco.appendChild(letterEl);
     });
-    
-    updateRosco();
 }
 
+// ================== MINI ROSCOS ==================
+function createMiniRoscos() {
+    const container = document.getElementById('miniRoscos');
+    container.innerHTML = '';
+
+    players.forEach((player, pIndex) => {
+        const mini = document.createElement('div');
+        mini.className = 'mini-rosco';
+        mini.id = `mini-${pIndex}`;
+
+        // NOMBRE
+        const name = document.createElement('div');
+        name.className = 'mini-name';
+        name.textContent = player.name;
+        mini.appendChild(name);
+
+        letters.forEach((letter, index) => {
+            const angle = (index / letters.length) * 360;
+
+            const el = document.createElement('div');
+            el.className = 'mini-letter';
+            el.textContent = letter;
+
+            el.style.transform = `rotate(${angle}deg) translateX(65px) rotate(-${angle}deg)`;
+
+            mini.appendChild(el);
+        });
+
+        container.appendChild(mini);
+    });
+}
+
+// ================== UPDATE ==================
 function updateRosco() {
     document.querySelectorAll('.letter').forEach((el, index) => {
         const letter = el.dataset.letter;
@@ -117,6 +152,29 @@ function updateRosco() {
     });
 }
 
+function updateMiniRoscos() {
+    players.forEach((player, pIndex) => {
+        const mini = document.getElementById(`mini-${pIndex}`);
+        if (!mini) return;
+
+        mini.classList.toggle('active', pIndex === currentPlayer);
+
+        const lettersEls = mini.querySelectorAll('.mini-letter');
+
+        lettersEls.forEach((el, index) => {
+            const letter = letters[index];
+            const state = player.letters[letter];
+
+            el.style.background = '#222';
+
+            if (state === 'correct') el.style.background = '#00ff88';
+            if (state === 'incorrect') el.style.background = '#ff4444';
+            if (state === 'pass') el.style.background = '#ffaa00';
+        });
+    });
+}
+
+// ================== GAME ==================
 function answer(type) {
     if (!gameActive) return;
     
@@ -125,9 +183,7 @@ function answer(type) {
     
     player.letters[currentLetter] = type;
     
-    if (type === 'correct') {
-        player.score++;
-    }
+    if (type === 'correct') player.score++;
     
     nextLetter();
     
@@ -145,36 +201,27 @@ function nextLetter() {
     let hasDefault = Object.values(player.letters).includes('default');
     let hasPass = Object.values(player.letters).includes('pass');
     
-    // Si ya no quedan "default", empezar a recorrer las "pass"
     let targetState = hasDefault ? 'default' : 'pass';
     
-    // Si no quedan ni default ni pass → termina
     if (!hasDefault && !hasPass) {
         endGame();
         return;
     }
     
-    let found = false;
-    
     for (let i = 0; i < letters.length; i++) {
         player.currentIndex = (player.currentIndex + 1) % letters.length;
         
         if (player.letters[letters[player.currentIndex]] === targetState) {
-            found = true;
-            break;
+            return;
         }
-    }
-    
-    if (!found) {
-        endGame();
     }
 }
 
 function nextPlayer() {
     currentPlayer = (currentPlayer + 1) % players.length;
-    updateRosco();
 }
 
+// ================== CLICK LETRA ==================
 function goToLetter(index) {
     const player = players[currentPlayer];
     
@@ -187,25 +234,42 @@ function goToLetter(index) {
     updateRosco();
 }
 
+// ================== TIMER ==================
 function startTimer() {
+    clearInterval(timerInterval);
+    
     timerInterval = setInterval(() => {
-        totalTimeLeft--;
-        updateDisplay();
+        if (!gameActive) return;
         
-        if (totalTimeLeft <= 0) {
-            endGame();
+        const player = players[currentPlayer];
+        player.timeLeft--;
+        
+        if (player.timeLeft <= 0) {
+            player.timeLeft = 0;
+            nextPlayer();
         }
+        
+        updateDisplay();
     }, 1000);
 }
 
+// ================== DISPLAY ==================
 function updateDisplay() {
-    document.getElementById('currentPlayer').textContent = players[currentPlayer].name;
-    document.getElementById('currentScore').textContent = players[currentPlayer].score;
-    document.getElementById('timer').textContent = formatTime(totalTimeLeft);
+    const player = players[currentPlayer];
+    
+    document.getElementById('currentPlayer').textContent = player.name;
+    document.getElementById('currentScore').textContent = player.score;
+    document.getElementById('timer').textContent = formatTime(player.timeLeft);
+
+    // 🔥 nombre grande arriba del rosco
+    const title = document.getElementById('playerTitle');
+    if (title) title.textContent = player.name;
     
     updateRosco();
+    updateMiniRoscos();
 }
 
+// ================== END ==================
 function endGame() {
     gameActive = false;
     clearInterval(timerInterval);
@@ -226,14 +290,10 @@ function endGame() {
 }
 
 function restartGame() {
-    document.getElementById('resultsScreen').style.display = 'none';
-    document.getElementById('configScreen').style.display = 'flex';
-    document.getElementById('playersNames').innerHTML = '';
-    document.getElementById('startBtn').style.display = 'none';
-    gameActive = false;
-    if (timerInterval) clearInterval(timerInterval);
+    location.reload();
 }
 
+// ================== SONIDO ==================
 function playSound(type) {
     try {
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -243,9 +303,7 @@ function playSound(type) {
         oscillator.connect(gainNode);
         gainNode.connect(audioContext.destination);
         
-        if (type === 'correct') oscillator.frequency.value = 800;
-        else if (type === 'incorrect') oscillator.frequency.value = 300;
-        else oscillator.frequency.value = 600;
+        oscillator.frequency.value = type === 'correct' ? 800 : type === 'incorrect' ? 300 : 600;
         
         gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
         gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
@@ -255,6 +313,7 @@ function playSound(type) {
     } catch(e) {}
 }
 
+// ================== INIT ==================
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🎮 Pasapalabra FULL PRO');
+    console.log('🎮 Pasapalabra FULL PRO listo');
 });
